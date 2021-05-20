@@ -28,6 +28,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   private final MethodChannel methodChannel;
   private final FlutterWebViewClient flutterWebViewClient;
   private final Handler platformThreadHandler;
+  private  PaxWebChromeClient chromeClient;
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   @SuppressWarnings("unchecked")
@@ -46,10 +47,14 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
     platformThreadHandler = new Handler(context.getMainLooper());
+    chromeClient = new PaxWebChromeClient(this,bar,mTitle);
+    webView.setWebChromeClient(chromeClient);
     // Allow local storage.
     webView.getSettings().setDomStorageEnabled(true);
     webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
     webView.getSettings().setAllowFileAccess(true);
+    webView.getSettings().setSupportMultipleWindows(true);
+    webView.getSettings().setDatabaseEnabled(true);
 
     methodChannel = new MethodChannel(messenger, "plugins.flutter.io/webview_" + id);
     methodChannel.setMethodCallHandler(this);
